@@ -51,8 +51,8 @@ export function KeyboardShortcuts() {
         <div key={key} style={rowStyle}>
           <span style={labelStyle}>{label}</span>
           <ShortcutInput
-            value={settings.shortcuts?.[key] ?? ''}
-            onChange={(value) => updateShortcuts({ [key]: value })}
+            value={(settings.shortcuts as unknown as Record<string, string | null>)?.[key] ?? ''}
+            onChange={(value) => updateShortcuts({ [key]: value } as any)}
           />
         </div>
       ))}

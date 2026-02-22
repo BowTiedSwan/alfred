@@ -37,6 +37,10 @@ pub fn run() {
     let hot_mic_active = Arc::new(AtomicBool::new(false));
     let whisper = Arc::new(Mutex::new(None::<WhisperTranscriber>));
     let model_status = Arc::new(Mutex::new("not_downloaded".to_string()));
+    let transcript_store = Arc::new(
+        ipc::transcript_store::TranscriptStore::new()
+            .expect("failed to initialize transcript store"),
+    );
 
     if let Ok(models_dir) = model::storage::models_dir() {
         if let Ok(entries) = std::fs::read_dir(models_dir) {
@@ -73,6 +77,7 @@ pub fn run() {
         command_matcher: command_matcher.clone(),
         model_downloads: Arc::new(model::download::ModelDownloadManager::new()),
         model_status: model_status.clone(),
+        transcript_store,
         connected_editors: Arc::new(Mutex::new(HashSet::new())),
         commands_directory: Arc::new(Mutex::new(None)),
         hot_mic_status: Arc::new(Mutex::new("off".to_string())),
@@ -121,6 +126,7 @@ pub fn run() {
             ipc::commands::get_transcription_history,
             ipc::commands::clear_transcription_history,
             ipc::commands::delete_transcript_entry,
+            ipc::commands::save_transcript_entry,
             ipc::commands::execute_command,
             ipc::commands::get_portable_commands,
             ipc::commands::set_commands_directory,

@@ -22,6 +22,7 @@ use crate::integrations::editor::EditorIntegration;
 use crate::ipc::events::{
     DownloadProgressPayload, DOWNLOAD_PROGRESS,
 };
+use crate::ipc::transcript_store::{self, TranscriptStore};
 use crate::model::download::ModelDownloadManager;
 use crate::model::storage;
 use crate::permissions;
@@ -36,6 +37,7 @@ pub struct AppState {
     pub command_matcher: CommandMatcher,
     pub model_downloads: Arc<ModelDownloadManager>,
     pub model_status: Arc<Mutex<String>>,
+    pub transcript_store: Arc<TranscriptStore>,
     pub connected_editors: Arc<Mutex<HashSet<String>>>,
     pub commands_directory: Arc<Mutex<Option<String>>>,
     pub hot_mic_status: Arc<Mutex<String>>,
@@ -184,15 +186,16 @@ pub fn get_audio_devices() -> Result<Vec<Value>, String> {
 
 #[tauri::command]
 pub fn set_priority_mic(state: State<'_, AppState>, name: Option<String>) -> Result<(), String> {
-    match name {
-        Some(device) => state
+    if let Some(device) = name {
+        state
             .priority_mic
             .set_priority_device(device)
-            .map_err(|e| e.to_string()),
-        None => state
+            .map_err(|e| e.to_string())
+    } else {
+        state
             .priority_mic
             .clear_priority_device()
-            .map_err(|e| e.to_string()),
+            .map_err(|e| e.to_string())
     }
 }
 
@@ -367,18 +370,43 @@ pub fn delete_model(model_id: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn get_transcription_history() -> Result<Vec<Value>, String> {
-    Ok(Vec::new())
+pub fn get_transcription_history(state: State<'_, AppState>) -> Result<Vec<Value>, String> {
+    state
+        .transcript_store
+        .load()
+        .map_err(|e| e.to_string())?
+        .into_iter()
+        .map(|entry| serde_json::to_value(entry).map_err(|e| e.to_string()))
+        .collect()
 }
 
 #[tauri::command]
-pub fn clear_transcription_history() -> Result<(), String> {
-    Ok(())
+pub fn clear_transcription_history(state: State<'_, AppState>) -> Result<(), String> {
+    state.transcript_store.clear().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn delete_transcript_entry(_id: String) -> Result<(), String> {
-    Ok(())
+pub fn delete_transcript_entry(state: State<'_, AppState>, id: String) -> Result<(), String> {
+    state.transcript_store.delete(&id).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn save_transcript_entry(
+    state: State<'_, AppState>,
+    id: String,
+    text: String,
+    timestamp: u64,
+    entry_type: String,
+    command_name: Option<String>,
+) -> Result<(), String> {
+    let entry = transcript_store::TranscriptEntry {
+        id,
+        text,
+        timestamp,
+        entry_type,
+        command_name,
+    };
+    state.transcript_store.add(entry).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { listen } from '@tauri-apps/api/event';
-import { getTranscriptionHistory, clearTranscriptionHistory, deleteTranscriptEntry } from '../types/commands';
+import {
+  getTranscriptionHistory,
+  clearTranscriptionHistory,
+  deleteTranscriptEntry,
+  saveTranscriptEntry,
+} from '../types/commands';
 import type { TranscriptEntry, TranscriptionUpdatePayload, CommandDetectedPayload } from '../types';
 
 export function useTranscription() {
@@ -31,6 +36,13 @@ export function useTranscription() {
             type: 'transcription',
           };
           setTranscripts(prev => [newEntry, ...prev]);
+          saveTranscriptEntry(
+            newEntry.id,
+            newEntry.text,
+            newEntry.timestamp,
+            newEntry.type,
+            newEntry.command_name
+          ).catch(console.error);
           setCurrentText('');
         } else {
           setCurrentText(text);
@@ -49,6 +61,13 @@ export function useTranscription() {
           command_name,
         };
         setTranscripts(prev => [newEntry, ...prev]);
+        saveTranscriptEntry(
+          newEntry.id,
+          newEntry.text,
+          newEntry.timestamp,
+          newEntry.type,
+          newEntry.command_name
+        ).catch(console.error);
       });
 
       if (cancelled) { unlistenTranscription(); unlistenCommand(); return; }

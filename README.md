@@ -147,11 +147,20 @@ Settings are stored in `~/Library/Application Support/dev.alfred.app/settings.js
 
 ## Roadmap
 
-- [ ] Qwen ASR engine integration (model entries exist, runtime not yet implemented)
-- [ ] Rive animation files (component wrappers ready, `.riv` assets pending)
-- [ ] Transcription history persistence
+### Completed
+- [x] Transcription history persistence - saves transcripts to disk, loads on startup
+- [x] Menu bar mode with dock icon - system tray with window management
+- [x] New design system - warm macOS-native UI with light/dark themes
+
+### In Progress
+- [ ] Qwen ASR engine integration (Python sidecar approach)
+- [ ] Rive animation files (.riv assets)
+
+### Planned
 - [ ] Screenshot capture integration
-- [ ] Menu bar mode (tray-only, no dock icon)
+- [ ] Portable commands folder watcher
+- [ ] Auto-stacks feature
+- [ ] The Librarian feature
 
 ## License
 

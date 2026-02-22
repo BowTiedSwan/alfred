@@ -99,6 +99,22 @@ export async function deleteTranscriptEntry(id: string): Promise<void> {
   await invoke('delete_transcript_entry', { id });
 }
 
+export async function saveTranscriptEntry(
+  id: string,
+  text: string,
+  timestamp: number,
+  entryType: string,
+  commandName?: string
+): Promise<void> {
+  await invoke('save_transcript_entry', {
+    id,
+    text,
+    timestamp,
+    entryType,
+    commandName: commandName ?? null,
+  });
+}
+
 // Command Execution
 export async function executeCommand(action: string): Promise<void> {
   await invoke('execute_command', { action });
