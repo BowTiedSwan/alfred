@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Alfred needs microphone access for voice transcription and Hot Mic commands.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Alfred needs automation permission to paste transcribed text into other applications and control windows.</string>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>Alfred needs screen recording permission to take screenshots for context stacking.</string>
+    <key>NSAccessibilityUsageDescription</key>
+    <string>Alfred needs accessibility permission to paste content into applications and manage window layouts.</string>
+</dict>
+</plist>
